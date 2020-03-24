@@ -1,10 +1,8 @@
 # JDAHBot
 
-Building discord bot using JDA (Java Discord API) for educational purpose only.
+Building discord bot using JDA (Java Discord API) for educational purpose only. <br><br>
 
----
 ## LuLu the cat!
----
 
 ![alt lulu][lulu]
 
