@@ -19,7 +19,7 @@ public class ReadyListener implements EventListener {
 
     public void onEvent(@Nonnull GenericEvent event) {
         if(event instanceof ReadyEvent) {
-            System.out.printf("%s is ready!", target);
+            System.out.printf("%s is ready!%n", target);
         }
     }
 }

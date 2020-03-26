@@ -7,11 +7,11 @@ import org.maejaporja.jdahbot.utils.ApplicationConfig;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-abstract public class BaseListener extends ListenerAdapter {
+abstract public class BaseEventListener extends ListenerAdapter {
 
     protected final String PATTERN;
 
-    protected BaseListener(String pattern){
+    protected BaseEventListener(String pattern){
         this.PATTERN = pattern;
     }
 
