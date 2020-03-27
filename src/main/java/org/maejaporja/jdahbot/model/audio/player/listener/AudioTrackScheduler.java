@@ -6,8 +6,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import org.maejaporja.jdahbot.model.base.BaseAudioListener;
+import org.maejaporja.jdahbot.utils.TimeFormat;
 
-public class TrackScheduler extends BaseAudioListener {
+public class AudioTrackScheduler extends BaseAudioListener {
+
+    public AudioTrackScheduler(){}
+    public AudioTrackScheduler(AudioPlayer audioPlayer){
+        super(audioPlayer);
+    }
+
     @Override
     public void onPlayerPause(AudioPlayer player) {
         // Player was paused
@@ -24,7 +31,7 @@ public class TrackScheduler extends BaseAudioListener {
         String author = audioTrackInfo.author;
         String title = audioTrackInfo.title;
         long length = audioTrackInfo.length;
-        System.out.printf("Now playing: %s - %s : %d%n", author, title, length);
+        System.out.printf("Now playing: %s - %s : %s%n", author, title, TimeFormat.getTimestamp(length));
     }
 
     @Override
