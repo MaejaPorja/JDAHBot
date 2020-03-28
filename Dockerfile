@@ -7,7 +7,7 @@ RUN ls -la
 
 RUN mvn -B package --file pom.xml
 RUN ls -la
-COPY target/* /usr/target/jdah-bot
+COPY target/ /usr/target/jdah-bot
 RUN rm -rf /usr/project/jdah-bot
 
 ENTRYPOINT ["java", "-jar", "/usr/target/jdah-bot/jdahbot-0.0.1-SNAPSHOT.jar"]
