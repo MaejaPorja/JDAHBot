@@ -1,1 +1,1 @@
-worker: java -jar target/jdahbot-0.0.1-SNAPSHOT.jar
+web: java -jar target/jdahbot-0.0.1-SNAPSHOT.jar
