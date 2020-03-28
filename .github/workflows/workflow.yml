@@ -15,14 +15,13 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    
-      - env: 
-          HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
-          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
 
       - uses: actions/checkout@master
 
       - name: Heroku login to container registry
+        env: 
+          HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:login
 
       - name: Set up JDK 11
@@ -33,7 +32,13 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Heroku push
+        env: 
+          HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:push --app $HEROKU_APP_NAME web 
 
       - name: Heroku release
+        env: 
+          HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:release --app $secrets.HEROKU_APP_NAME web 
