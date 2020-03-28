@@ -13,7 +13,8 @@ import java.util.*;
 
 public class JDAHBotDriver {
     public static void main(String[] args) throws LoginException, InterruptedException {
-        String token = args[0];
+        String token = System.getenv("token");
+        token = !Objects.isNull(token) ? token : args[0];
         JDA jdah = ready(getJDABot(token));
     }
 
