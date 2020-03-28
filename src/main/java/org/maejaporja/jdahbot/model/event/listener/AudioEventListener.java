@@ -13,7 +13,7 @@ import org.maejaporja.jdahbot.model.audio.player.AudioPlayerHandler;
 import org.maejaporja.jdahbot.model.audio.player.listener.AudioTrackScheduler;
 import org.maejaporja.jdahbot.model.ecosystem.EcosystemManager;
 import org.maejaporja.jdahbot.model.base.BaseEventListener;
-import org.maejaporja.jdahbot.model.event.pattern.EventPattern;
+import org.maejaporja.jdahbot.model.event.pattern.AudioEventPattern;
 import org.maejaporja.jdahbot.utils.TimeFormat;
 
 import javax.annotation.Nonnull;
@@ -29,9 +29,12 @@ public class AudioEventListener extends BaseEventListener {
 
     public AudioEventListener(){
         super(
-                new EventPattern[]{
-                        EventPattern.PLAY,
-                        EventPattern.LEAVE
+                new AudioEventPattern[]{
+                        AudioEventPattern.PLAY,
+                        AudioEventPattern.LEAVE,
+                        AudioEventPattern.SKIP,
+                        AudioEventPattern.VOLUME,
+                        AudioEventPattern.QUEUE
                 }
         );
         this.audioPlayerEcosystemManager = new EcosystemManager<>();
@@ -62,9 +65,9 @@ public class AudioEventListener extends BaseEventListener {
 
         EcosystemManager.EcosystemExecutor audioPlayerEcosystemExecutor =
                 audioPlayerEcosystemManager.new EcosystemExecutor(audioPlayerEcosystem);
-        EventPattern pattern = EventPattern.valueOf(eventPattern);
+        AudioEventPattern pattern = AudioEventPattern.valueOf(eventPattern);
 
-        if(pattern.equals(EventPattern.PLAY)) {
+        if(pattern.equals(AudioEventPattern.PLAY)) {
             Consumer<AudioPlayerEcosystem> connect = audioPlayerEcosystem1 -> {
                 AudioPlayerHandler audioPlayerHandler = audioPlayerEcosystem1.getAudioPlayerHandler();
                 AudioManager audioManager = guild.getAudioManager();
@@ -78,7 +81,7 @@ public class AudioEventListener extends BaseEventListener {
                 audioPlayerManager.loadItemOrdered(audioPlayerEcosystem, eventMessage, audioLoadResultHandler);
             };
             audioPlayerEcosystemExecutor.execute(connect.andThen(play));
-        } else if(pattern.equals(EventPattern.LEAVE)){
+        } else if(pattern.equals(AudioEventPattern.LEAVE)){
             Consumer<AudioPlayerEcosystem> leave = audioPlayerEcosystem1 -> {
                 AudioManager audioManager = guild.getAudioManager();
                 audioManager.setSendingHandler(null);
@@ -86,13 +89,13 @@ public class AudioEventListener extends BaseEventListener {
                 audioManager.closeAudioConnection();
             };
             audioPlayerEcosystemExecutor.execute(leave);
-        } else if(pattern.equals(EventPattern.SKIP)){
+        } else if(pattern.equals(AudioEventPattern.SKIP)){
             Consumer<AudioPlayerEcosystem> skip = audioPlayerEcosystem1 -> {
                 AudioTrackScheduler audioTrackScheduler = audioPlayerEcosystem1.getAudioEvent();
                 audioTrackScheduler.nextTrack();
             };
             audioPlayerEcosystemExecutor.execute(skip);
-        } else if(pattern.equals(EventPattern.QUEUE)){
+        } else if(pattern.equals(AudioEventPattern.QUEUE)){
             Consumer<AudioPlayerEcosystem> queue = audioPlayerEcosystem1 -> {
                 StringBuilder stringBuilder = new StringBuilder("```");
                 Iterator<AudioTrack> audioTrackIterator = audioPlayerEcosystem1.getAudioEvent().iterator();
@@ -114,7 +117,7 @@ public class AudioEventListener extends BaseEventListener {
                 message.getChannel().sendMessage(stringBuilder).queue();
             };
             audioPlayerEcosystemExecutor.execute(queue);
-        } else if(pattern.equals(EventPattern.VOLUME)){
+        } else if(pattern.equals(AudioEventPattern.VOLUME)){
             Consumer<AudioPlayerEcosystem> volume = audioPlayerEcosystem1 -> {
                 AudioPlayer audioPlayer = audioPlayerEcosystem1.getAudioPlayer();
                 int audioPlayerVolume = audioPlayer.getVolume();
@@ -143,7 +146,7 @@ public class AudioEventListener extends BaseEventListener {
     @Override
     protected boolean checkEventPattern(String pattern){
         try {
-            EventPattern.valueOf(pattern);
+            AudioEventPattern.valueOf(pattern);
             return true;
         } catch(IllegalArgumentException err){
             return false;

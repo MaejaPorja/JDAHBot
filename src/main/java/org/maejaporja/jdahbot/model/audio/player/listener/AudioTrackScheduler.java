@@ -63,7 +63,7 @@ public class AudioTrackScheduler extends BaseAudioListener
 
     public void queue(AudioTrack audioTrack){
         AudioPlayer audioPlayer = getAudioPlayer();
-        if(!audioPlayer.startTrack(audioTrack, true)){
+        if(!(queue.size() > 15) && !audioPlayer.startTrack(audioTrack, true)){
             queue.offer(audioTrack);
         }
     }

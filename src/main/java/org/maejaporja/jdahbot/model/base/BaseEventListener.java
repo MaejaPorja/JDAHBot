@@ -2,17 +2,17 @@ package org.maejaporja.jdahbot.model.base;
 
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.maejaporja.jdahbot.model.event.pattern.EventPattern;
+import org.maejaporja.jdahbot.model.event.pattern.AudioEventPattern;
 import org.maejaporja.jdahbot.utils.ApplicationConfig;
 
 import java.util.Iterator;
 
 abstract public class BaseEventListener extends ListenerAdapter
-        implements Iterable<EventPattern> {
+        implements Iterable<AudioEventPattern> {
 
-    private final EventPattern[] PATTERN;
+    private final AudioEventPattern[] PATTERN;
 
-    protected BaseEventListener(EventPattern[] pattern){
+    protected BaseEventListener(AudioEventPattern[] pattern){
         this.PATTERN = pattern;
     }
 
@@ -23,20 +23,20 @@ abstract public class BaseEventListener extends ListenerAdapter
     }
     protected boolean clearEventMessage(){ return false; }
 
-    public EventPattern[] getPATTERN(){
+    public AudioEventPattern[] getPATTERN(){
         return PATTERN;
     }
 
     @Override
-    public Iterator<EventPattern> iterator(){
-        return new Iterator<EventPattern>(){
+    public Iterator<AudioEventPattern> iterator(){
+        return new Iterator<AudioEventPattern>(){
             int index = -1;
             @Override
             public boolean hasNext() {
                 return ++index < PATTERN.length;
             }
             @Override
-            public EventPattern next() {
+            public AudioEventPattern next() {
                 return PATTERN[index];
             }
         };
