@@ -2,7 +2,6 @@ package org.maejaporja.jdahbot.model.event.listener;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -14,6 +13,7 @@ import org.maejaporja.jdahbot.model.base.BaseEventListener;
 import org.maejaporja.jdahbot.model.event.pattern.EventPattern;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -51,6 +51,10 @@ public class AudioEventListener extends BaseEventListener {
         }
 
         AudioPlayerEcosystem audioPlayerEcosystem = getAudioEcosystem(guild);
+        Map<String, Object> audioPlayerEcosystemEnvironment = audioPlayerEcosystem.getEnvironment();
+        audioPlayerEcosystemEnvironment.put("messageChannel", message.getChannel());
+        setAudioEcosystemEnvironment(audioPlayerEcosystem, audioPlayerEcosystemEnvironment);
+
         EcosystemManager.EcosystemExecutor audioPlayerEcosystemExecutor =
                 audioPlayerEcosystemManager.new EcosystemExecutor(audioPlayerEcosystem);
         EventPattern pattern = EventPattern.valueOf(eventPattern);
@@ -77,6 +81,12 @@ public class AudioEventListener extends BaseEventListener {
                 audioManager.closeAudioConnection();
             };
             audioPlayerEcosystemExecutor.execute(leave);
+        } else if(pattern.equals(EventPattern.SKIP)){
+            Consumer<AudioPlayerEcosystem> skip = audioPlayerEcosystem1 ->  {
+                AudioTrackScheduler audioTrackScheduler = audioPlayerEcosystem1.getAudioEvent();
+                audioTrackScheduler.nextTrack();
+            };
+            audioPlayerEcosystemExecutor.execute(skip);
         }
     }
     @Override
@@ -98,13 +108,16 @@ public class AudioEventListener extends BaseEventListener {
         String guildId = guild.getId();
         AudioPlayerEcosystem audioPlayerEcosystem = audioPlayerEcosystemManager.getEcosystem(guildId);
         if(Objects.isNull(audioPlayerEcosystem)) {
-            AudioEventAdapter audioPlayerEvent = new AudioTrackScheduler();
-            audioPlayerEcosystem =  new AudioPlayerEcosystem(audioPlayerEvent);
+            audioPlayerEcosystem =  new AudioPlayerEcosystem();
             synchronized(audioPlayerEcosystemManager){
                 audioPlayerEcosystemManager.addEcosystem(guildId, audioPlayerEcosystem);
             }
         }
         return audioPlayerEcosystem;
+    }
+    private void setAudioEcosystemEnvironment(AudioPlayerEcosystem audioPlayerEcosystem
+            , Map<String, Object> environment){
+        audioPlayerEcosystem.setEnvironment(environment);
     }
 
 }

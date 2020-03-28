@@ -5,18 +5,14 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 
 abstract public class BaseAudioListener extends AudioEventAdapter {
 
-    private AudioPlayer audioPlayer;
+    private final AudioPlayer audioPlayer;
 
-    protected BaseAudioListener(){}
     protected BaseAudioListener(AudioPlayer audioPlayer){
         this.audioPlayer = audioPlayer;
     }
 
-    public AudioPlayer getAudioPlayer() {
+    protected AudioPlayer getAudioPlayer() {
         return audioPlayer;
-    }
-    public void setAudioPlayer(AudioPlayer audioPlayer) {
-        this.audioPlayer = audioPlayer;
     }
 
 }

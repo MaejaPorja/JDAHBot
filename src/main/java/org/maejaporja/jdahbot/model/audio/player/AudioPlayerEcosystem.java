@@ -3,19 +3,23 @@ package org.maejaporja.jdahbot.model.audio.player;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import org.maejaporja.jdahbot.model.audio.player.listener.AudioTrackScheduler;
+import org.maejaporja.jdahbot.model.base.BaseEcosystem;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
-public class AudioPlayerEcosystem {
+public class AudioPlayerEcosystem extends BaseEcosystem {
 
     public static AudioPlayerManager audioPlayerManager;
     private AudioLoadResultHandler audioLoadResultHandler;
     private AudioPlayerHandler audioPlayerHandler;
+    private AudioTrackScheduler audioEvent;
     private AudioPlayer audioPlayer;
 
     static {
@@ -23,18 +27,23 @@ public class AudioPlayerEcosystem {
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
     }
 
-    public AudioPlayerEcosystem(AudioEventAdapter audioEvent){
+    public AudioPlayerEcosystem(){
+        this(new HashMap<>());
+    }
+    public AudioPlayerEcosystem(Map<String, Object> environment){
+        super(environment);
         this.audioPlayer = audioPlayerManager.createPlayer();
+        this.audioEvent = new AudioTrackScheduler(audioPlayer);
         this.audioPlayerHandler = new AudioPlayerHandler(audioPlayer);
         this.audioLoadResultHandler = new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
-                String msg = "Adding to queue: " + audioTrack.getInfo().title;
-                if (Objects.isNull(audioPlayer.getPlayingTrack()))
-                    msg += "\nand the Player has started playing;";
-                audioPlayer.playTrack(audioTrack);
-//                mng.scheduler.queue(track);
-//                channel.sendMessage(msg).queue();
+                MessageChannel channel = (MessageChannel) getEnvironment().get("messageChannel");
+                String author = audioTrack.getInfo().author;
+                String title = audioTrack.getInfo().title;
+                String msg = String.format("Adding to queue: %s - %s", author, title);
+                audioEvent.queue(audioTrack);
+                channel.sendMessage(msg).queue();
             }
             @Override
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
@@ -61,6 +70,9 @@ public class AudioPlayerEcosystem {
     public AudioPlayerHandler getAudioPlayerHandler() {
         return audioPlayerHandler;
     }
+    public AudioTrackScheduler getAudioEvent() {
+        return audioEvent;
+    }
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
     }
@@ -73,6 +85,9 @@ public class AudioPlayerEcosystem {
     }
     public void setAudioPlayerHandler(AudioPlayerHandler audioPlayerHandler) {
         this.audioPlayerHandler = audioPlayerHandler;
+    }
+    public void setAudioEvent(AudioTrackScheduler audioEvent) {
+        this.audioEvent = audioEvent;
     }
     public void setAudioPlayer(AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;

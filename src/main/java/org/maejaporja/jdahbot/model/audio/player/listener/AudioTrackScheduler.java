@@ -1,28 +1,25 @@
 package org.maejaporja.jdahbot.model.audio.player.listener;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import org.maejaporja.jdahbot.model.base.BaseAudioListener;
 import org.maejaporja.jdahbot.utils.TimeFormat;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class AudioTrackScheduler extends BaseAudioListener {
 
-    public AudioTrackScheduler(){}
+    private boolean repeating;
+    private final Queue<AudioTrack> queue;
+    private AudioTrack lastTrack;
+
     public AudioTrackScheduler(AudioPlayer audioPlayer){
         super(audioPlayer);
-    }
-
-    @Override
-    public void onPlayerPause(AudioPlayer player) {
-        // Player was paused
-    }
-
-    @Override
-    public void onPlayerResume(AudioPlayer player) {
-        // Player was resumed
+        this.queue = new LinkedList<>();
     }
 
     @Override
@@ -35,9 +32,14 @@ public class AudioTrackScheduler extends BaseAudioListener {
     }
 
     @Override
-    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (endReason.mayStartNext) {
-            // Start next track
+    public void onTrackEnd(AudioPlayer player, AudioTrack audioTrack, AudioTrackEndReason endReason) {
+        AudioPlayer audioPlayer = getAudioPlayer();
+        this.lastTrack = audioTrack;
+        if(endReason.mayStartNext) {
+            if(repeating)
+                audioPlayer.startTrack(lastTrack.makeClone(), false);
+            else
+                nextTrack();
         }
 
         // endReason == FINISHED: A track finished or died by an exception (mayStartNext = true).
@@ -48,13 +50,21 @@ public class AudioTrackScheduler extends BaseAudioListener {
         //                       clone of this back to your queue
     }
 
-    @Override
-    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        // An already playing track threw an exception (track end event will still be received separately)
+    public void queue(AudioTrack audioTrack){
+        AudioPlayer audioPlayer = getAudioPlayer();
+        if(!audioPlayer.startTrack(audioTrack, true)){
+            queue.offer(audioTrack);
+        }
+    }
+    public void nextTrack(){
+        AudioPlayer audioPlayer = getAudioPlayer();
+        audioPlayer.startTrack(queue.poll(), false);
+    }
+    public boolean isRepeating(){
+        return repeating;
+    }
+    public void setRepeating(boolean repeating){
+        this.repeating = repeating;
     }
 
-    @Override
-    public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        // Audio track has been unable to provide us any audio, might want to just start a new track
-    }
 }
