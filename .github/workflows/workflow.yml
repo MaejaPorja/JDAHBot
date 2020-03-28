@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Deploy to Heroku
+name: Build and deploy to Heroku
 
 on:
   push:
@@ -28,10 +28,10 @@ jobs:
         env: 
           HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
           HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
-        run: heroku container:push --app $HEROKU_APP_NAME web 
+        run: heroku container:push --app $HEROKU_APP_NAME worker
 
       - name: Heroku release
         env: 
           HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
           HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
-        run: heroku container:release --app $HEROKU_APP_NAME web 
+        run: heroku container:release --app $HEROKU_APP_NAME worker

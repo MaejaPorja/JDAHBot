@@ -46,7 +46,7 @@ public class AudioEventListener extends BaseEventListener {
         User author = message.getAuthor();
         Member member = message.getMember();
         Guild guild = message.getGuild();
-        VoiceChannel channel = member.getVoiceState().getChannel();
+        GuildVoiceState guildVoiceState = member.getVoiceState();
 
         String[] splitMessage = message.getContentRaw().split(" ", 3);
 
@@ -54,10 +54,11 @@ public class AudioEventListener extends BaseEventListener {
         String eventPattern = splitMessage.length > 1 ? splitMessage[1].toUpperCase() : "";
         String eventMessage = splitMessage.length > 2 ? splitMessage[2] : "";
 
-        if(author.isBot() || !checkMessageFormat(rootMessage, eventPattern) || Objects.isNull(channel)) {
+        if(author.isBot() || !checkMessageFormat(rootMessage, eventPattern) || Objects.isNull(guildVoiceState)) {
             return;
         }
 
+        VoiceChannel channel = guildVoiceState.getChannel();
         AudioPlayerEcosystem audioPlayerEcosystem = getAudioEcosystem(guild);
         Map<String, Object> audioPlayerEcosystemEnvironment = audioPlayerEcosystem.getEnvironment();
         audioPlayerEcosystemEnvironment.put("messageChannel", message.getChannel());
