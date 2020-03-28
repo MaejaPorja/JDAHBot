@@ -22,6 +22,8 @@ public class AudioPlayerEcosystem extends BaseEcosystem {
     private AudioTrackScheduler audioEvent;
     private AudioPlayer audioPlayer;
 
+    private static final int DEFAULT_VOLUME = 70;
+
     static {
         audioPlayerManager = AudioPlayerManagerSingleton.getInstance();
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
@@ -33,7 +35,7 @@ public class AudioPlayerEcosystem extends BaseEcosystem {
     public AudioPlayerEcosystem(Map<String, Object> environment){
         super(environment);
         this.audioPlayer = audioPlayerManager.createPlayer();
-        this.audioEvent = new AudioTrackScheduler(audioPlayer);
+        this.audioEvent = new AudioTrackScheduler(audioPlayer, environment);
         this.audioPlayerHandler = new AudioPlayerHandler(audioPlayer);
         this.audioLoadResultHandler = new AudioLoadResultHandler() {
             @Override
@@ -41,7 +43,7 @@ public class AudioPlayerEcosystem extends BaseEcosystem {
                 MessageChannel channel = (MessageChannel) getEnvironment().get("messageChannel");
                 String author = audioTrack.getInfo().author;
                 String title = audioTrack.getInfo().title;
-                String msg = String.format("Adding to queue: %s - %s", author, title);
+                String msg = String.format("> Adding to queue: %s - %s", author, title);
                 audioEvent.queue(audioTrack);
                 channel.sendMessage(msg).queue();
             }
@@ -59,6 +61,7 @@ public class AudioPlayerEcosystem extends BaseEcosystem {
             }
         };
         this.audioPlayer.addListener(audioEvent);
+        this.audioPlayer.setVolume(DEFAULT_VOLUME);
     }
 
     public static AudioPlayerManager getAudioPlayerManager() {

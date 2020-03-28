@@ -1,7 +1,10 @@
 package org.maejaporja.jdahbot.model.event.listener;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -11,8 +14,10 @@ import org.maejaporja.jdahbot.model.audio.player.listener.AudioTrackScheduler;
 import org.maejaporja.jdahbot.model.ecosystem.EcosystemManager;
 import org.maejaporja.jdahbot.model.base.BaseEventListener;
 import org.maejaporja.jdahbot.model.event.pattern.EventPattern;
+import org.maejaporja.jdahbot.utils.TimeFormat;
 
 import javax.annotation.Nonnull;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -70,11 +75,11 @@ public class AudioEventListener extends BaseEventListener {
             Consumer<AudioPlayerEcosystem> play = audioPlayerEcosystem1 -> {
                 AudioPlayerManager audioPlayerManager = AudioPlayerEcosystem.audioPlayerManager;
                 AudioLoadResultHandler audioLoadResultHandler = audioPlayerEcosystem1.getAudioLoadResultHandler();
-                audioPlayerManager.loadItem(eventMessage, audioLoadResultHandler);
+                audioPlayerManager.loadItemOrdered(audioPlayerEcosystem, eventMessage, audioLoadResultHandler);
             };
             audioPlayerEcosystemExecutor.execute(connect.andThen(play));
         } else if(pattern.equals(EventPattern.LEAVE)){
-            Consumer<AudioPlayerEcosystem> leave = audioPlayerEcosystem1 ->  {
+            Consumer<AudioPlayerEcosystem> leave = audioPlayerEcosystem1 -> {
                 AudioManager audioManager = guild.getAudioManager();
                 audioManager.setSendingHandler(null);
                 audioManager.setReceivingHandler(null);
@@ -82,11 +87,52 @@ public class AudioEventListener extends BaseEventListener {
             };
             audioPlayerEcosystemExecutor.execute(leave);
         } else if(pattern.equals(EventPattern.SKIP)){
-            Consumer<AudioPlayerEcosystem> skip = audioPlayerEcosystem1 ->  {
+            Consumer<AudioPlayerEcosystem> skip = audioPlayerEcosystem1 -> {
                 AudioTrackScheduler audioTrackScheduler = audioPlayerEcosystem1.getAudioEvent();
                 audioTrackScheduler.nextTrack();
             };
             audioPlayerEcosystemExecutor.execute(skip);
+        } else if(pattern.equals(EventPattern.QUEUE)){
+            Consumer<AudioPlayerEcosystem> queue = audioPlayerEcosystem1 -> {
+                StringBuilder stringBuilder = new StringBuilder("```");
+                Iterator<AudioTrack> audioTrackIterator = audioPlayerEcosystem1.getAudioEvent().iterator();
+                int counter = 1;
+                while(audioTrackIterator.hasNext()){
+                    AudioTrack audioTrack = audioTrackIterator.next();
+                    AudioTrackInfo audioTrackInfo = audioTrack.getInfo();
+                    String audioTrackAuthor = audioTrackInfo.author;
+                    String audioTrackTitle = audioTrackInfo.title;
+                    long length = audioTrackInfo.length;
+                    stringBuilder.append(
+                            String.format(
+                                    "%d) %s — %s — %s%n", counter++, audioTrackAuthor, audioTrackTitle,
+                                    TimeFormat.getTimestamp(length)
+                            )
+                    );
+                }
+                stringBuilder.append("```");
+                message.getChannel().sendMessage(stringBuilder).queue();
+            };
+            audioPlayerEcosystemExecutor.execute(queue);
+        } else if(pattern.equals(EventPattern.VOLUME)){
+            Consumer<AudioPlayerEcosystem> volume = audioPlayerEcosystem1 -> {
+                AudioPlayer audioPlayer = audioPlayerEcosystem1.getAudioPlayer();
+                int audioPlayerVolume = audioPlayer.getVolume();
+                String mesg = "> Current player volume: "+audioPlayerVolume;
+                try{
+                    if(!eventMessage.equals("")){
+                        audioPlayerVolume = Integer.parseInt(eventMessage);
+                        audioPlayerVolume = audioPlayerVolume > 150 ? 150 :
+                                audioPlayerVolume < 0 ? 0 : audioPlayerVolume;
+                        audioPlayer.setVolume(audioPlayerVolume);
+                        mesg = "> Current player volume: "+audioPlayerVolume;
+                    }
+                } catch(NumberFormatException err){
+                    mesg = "> Volume must be integer.";
+                }
+                message.getChannel().sendMessage(mesg).queue();
+            };
+            audioPlayerEcosystemExecutor.execute(volume);
         }
     }
     @Override
