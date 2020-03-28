@@ -22,6 +22,8 @@ public class AudioTrackScheduler extends BaseAudioListener
     private AudioTrack lastTrack;
     private Map<String, Object> data;
 
+    public static final int DEFAULT_QUEUE_MAX = 16;
+
     public AudioTrackScheduler(AudioPlayer audioPlayer){
         this(audioPlayer, null);
     }
@@ -62,8 +64,9 @@ public class AudioTrackScheduler extends BaseAudioListener
     }
 
     public void queue(AudioTrack audioTrack){
+        Integer queueMax = (Integer) data.get("queueMax");
         AudioPlayer audioPlayer = getAudioPlayer();
-        if(!(queue.size() > 15) && !audioPlayer.startTrack(audioTrack, true)){
+        if(!(queue.size() > queueMax-1) && !audioPlayer.startTrack(audioTrack, true)){
             queue.offer(audioTrack);
         }
     }
@@ -76,6 +79,10 @@ public class AudioTrackScheduler extends BaseAudioListener
     }
     public void setRepeating(boolean repeating){
         this.repeating = repeating;
+    }
+
+    public Queue<AudioTrack> getQueue(){
+        return this.queue;
     }
 
     @NotNull

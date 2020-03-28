@@ -61,6 +61,7 @@ public class AudioEventListener extends BaseEventListener {
         AudioPlayerEcosystem audioPlayerEcosystem = getAudioEcosystem(guild);
         Map<String, Object> audioPlayerEcosystemEnvironment = audioPlayerEcosystem.getEnvironment();
         audioPlayerEcosystemEnvironment.put("messageChannel", message.getChannel());
+        audioPlayerEcosystemEnvironment.put("queueMax", AudioTrackScheduler.DEFAULT_QUEUE_MAX);
         setAudioEcosystemEnvironment(audioPlayerEcosystem, audioPlayerEcosystemEnvironment);
 
         EcosystemManager.EcosystemExecutor audioPlayerEcosystemExecutor =

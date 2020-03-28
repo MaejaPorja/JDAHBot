@@ -13,6 +13,7 @@ import org.maejaporja.jdahbot.model.base.BaseEcosystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 public class AudioPlayerEcosystem extends BaseEcosystem {
 
@@ -41,10 +42,16 @@ public class AudioPlayerEcosystem extends BaseEcosystem {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
                 MessageChannel channel = (MessageChannel) getEnvironment().get("messageChannel");
-                String author = audioTrack.getInfo().author;
-                String title = audioTrack.getInfo().title;
-                String msg = String.format("> Adding to queue: %s - %s", author, title);
-                audioEvent.queue(audioTrack);
+                Integer queueMax = (Integer) getEnvironment().get("queueMax");
+                AudioTrackScheduler audioTrackScheduler = audioEvent;
+                Queue<AudioTrack> audioTrackQueue = audioTrackScheduler.getQueue();
+                String msg = "> Queue is now at maximum capacity("+queueMax+')';
+                if(!(audioTrackQueue.size() > queueMax-1)) {
+                    String author = audioTrack.getInfo().author;
+                    String title = audioTrack.getInfo().title;
+                    msg = String.format("> Adding to queue: %s - %s", author, title);
+                    audioEvent.queue(audioTrack);
+                }
                 channel.sendMessage(msg).queue();
             }
             @Override
