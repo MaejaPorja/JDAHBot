@@ -1,1 +1,1 @@
-worker: java -jar target/jdahbot.jar
+worker java -jar /usr/target/jdah-bot/jdahbot.jar
