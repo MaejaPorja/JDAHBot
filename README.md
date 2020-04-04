@@ -10,7 +10,6 @@ Building discord bot using JDA (Java Discord API) for educational purpose only. 
 
 <br>
 
-Execute these commands to install project dependencies.
 ```
-mvn install
+mvn -B package --file pom.xml || mvn install
 ```
