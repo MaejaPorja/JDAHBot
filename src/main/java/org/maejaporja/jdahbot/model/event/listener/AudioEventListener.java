@@ -50,7 +50,7 @@ public class AudioEventListener extends BaseEventListener {
 
         String[] splitMessage = message.getContentRaw().split(" ", 3);
 
-        String rootMessage = splitMessage[0];
+        String rootMessage = splitMessage[0].toUpperCase();
         String eventPattern = splitMessage.length > 1 ? splitMessage[1].toUpperCase() : "";
         String eventMessage = splitMessage.length > 2 ? splitMessage[2] : "";
 
@@ -114,6 +114,9 @@ public class AudioEventListener extends BaseEventListener {
                                     TimeFormat.getTimestamp(length)
                             )
                     );
+                }
+                if (counter == 1){
+                    stringBuilder.append("Queue is empty");
                 }
                 stringBuilder.append("```");
                 message.getChannel().sendMessage(stringBuilder).queue();

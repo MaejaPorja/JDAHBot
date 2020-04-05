@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.maejaporja.jdahbot.model.event.listener.AudioEventListener;
 import org.maejaporja.jdahbot.model.event.listener.ListenerRegister;
+import org.maejaporja.jdahbot.model.event.listener.MessageEventListener;
 import org.maejaporja.jdahbot.model.event.listener.ReadyListener;
 import org.maejaporja.jdahbot.utils.ApplicationConfig;
 
@@ -31,6 +32,7 @@ public class JDAHBotDriver {
         Collection<EventListener> eventListeners = new ArrayList<>();
         eventListeners.add(new ReadyListener(ApplicationConfig.APPLICATION));
         eventListeners.add(new AudioEventListener());
+        eventListeners.add(new MessageEventListener());
 
         ListenerRegister jdaLR = new ListenerRegister(jdaBuilder);
         jdaLR.register(eventListeners);
