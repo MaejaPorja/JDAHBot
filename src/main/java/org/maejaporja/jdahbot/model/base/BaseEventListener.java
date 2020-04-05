@@ -1,42 +1,49 @@
 package org.maejaporja.jdahbot.model.base;
 
-import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.maejaporja.jdahbot.model.event.pattern.AudioEventPattern;
+import org.jetbrains.annotations.NotNull;
+import org.maejaporja.jdahbot.model.event.pattern.EventPattern;
 import org.maejaporja.jdahbot.utils.ApplicationConfig;
 
 import java.util.Iterator;
 
 abstract public class BaseEventListener extends ListenerAdapter
-        implements Iterable<AudioEventPattern> {
+        implements Iterable<EventPattern> {
 
-    private final AudioEventPattern[] PATTERN;
+    private final EventPattern[] PATTERN;
 
-    protected BaseEventListener(AudioEventPattern[] pattern){
+    protected BaseEventListener(EventPattern[] pattern){
         this.PATTERN = pattern;
     }
-
     protected boolean checkMessageFormat(String rootMessages, String... messages){ return false; }
     protected boolean checkEventPattern(String pattern){ return false; }
+    protected boolean checkEventChannel(Event event){ return false; }
     protected boolean startsWithRootPrefix(String message){
-        return message.startsWith(ApplicationConfig.PREFIX);
+        String[] PREFIXES = ApplicationConfig.PREFIXES;
+        String trimMessage = message.trim();
+        for(String prefix : PREFIXES){
+            if(trimMessage.startsWith(prefix))
+                return true;
+        } return false;
     }
     protected boolean clearEventMessage(){ return false; }
 
-    public AudioEventPattern[] getPATTERN(){
+    public EventPattern[] getPATTERN(){
         return PATTERN;
     }
 
+    @NotNull
     @Override
-    public Iterator<AudioEventPattern> iterator(){
-        return new Iterator<AudioEventPattern>(){
+    public Iterator<EventPattern> iterator(){
+        return new Iterator<EventPattern>(){
             int index = -1;
             @Override
             public boolean hasNext() {
                 return ++index < PATTERN.length;
             }
             @Override
-            public AudioEventPattern next() {
+            public EventPattern next() {
                 return PATTERN[index];
             }
         };

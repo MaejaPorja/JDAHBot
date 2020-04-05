@@ -115,6 +115,9 @@ public class AudioEventListener extends BaseEventListener {
                             )
                     );
                 }
+                if (counter == 1){
+                    stringBuilder.append("Queue is empty");
+                }
                 stringBuilder.append("```");
                 message.getChannel().sendMessage(stringBuilder).queue();
             };
