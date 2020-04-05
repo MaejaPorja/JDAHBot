@@ -5,9 +5,9 @@ name: Build and deploy to Heroku
 
 on:
   push:
-    branches: develop
+    branches: master
   pull_request:
-    branches: develop
+    branches: master
 
 jobs:
   build:
@@ -21,17 +21,17 @@ jobs:
       - name: Heroku login to container registry
         env: 
           HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
-          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME_DEVEL}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:login
 
       - name: Heroku push
         env: 
           HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
-          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME_DEVEL}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:push --app $HEROKU_APP_NAME worker
 
       - name: Heroku release
         env: 
           HEROKU_API_KEY : ${{secrets.HEROKU_API_KEY}}
-          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME_DEVEL}}
+          HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
         run: heroku container:release --app $HEROKU_APP_NAME worker
