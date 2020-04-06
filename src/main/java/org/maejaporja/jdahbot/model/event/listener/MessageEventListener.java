@@ -50,13 +50,14 @@ public class MessageEventListener extends BaseEventListener {
             message.getChannel().sendMessage("Test Test").queue();
         } else if (pattern.equals(MessageEventPattern.จริง)) {
             String[] jings = ApplicationConfig.JINGS;
-            String jing = jings[(int)(Math.random()*jings.length)];
+            String jing = jings[(int) (Math.random() * jings.length)];
             message.getChannel().sendMessage(jing).queue();
-        } else if (pattern.equals(MessageEventPattern.เรียกอาท)) {
-            message.getChannel().sendMessage(
-                    String.format("ไอห่า สบายดีไหมนิ <@%s>", ApplicationConfig.MUZASHII_ID)
-            ).queue();
         }
+//        } else if (pattern.equals(MessageEventPattern.เรียกอาท)) {
+//            message.getChannel().sendMessage(
+//                    String.format("ไอห่า สบายดีไหมนิ <@%s>", ApplicationConfig.MUZASHII_ID)
+//            ).queue();
+//        }
     }
 
     @Override
