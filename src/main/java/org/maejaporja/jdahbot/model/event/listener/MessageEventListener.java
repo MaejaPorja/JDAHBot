@@ -18,8 +18,8 @@ public class MessageEventListener extends BaseEventListener {
         super(new MessageEventPattern[]{
                 MessageEventPattern.SAY,
                 MessageEventPattern.HELLO,
-                MessageEventPattern.เรียกอาท,
-                MessageEventPattern.จริง,
+//                MessageEventPattern.เรียกอาท,
+                MessageEventPattern.จริง
         });
     }
 
